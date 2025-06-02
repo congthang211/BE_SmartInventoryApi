@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "MJO5hUJhvGDPU1aFBWxwpfK1Nk404CIb2fyGKt80A1/BMnNA3Xh36MvyFerzqp+BJ2xD7eNa2ZzsGOHMmOqGtA==",
+  "dgSpecHash": "YpH+YOjmrP35FpUQXhohNHLDNdnatlf5ZJfyjLfyu4h68hnzphI7M5f1tN+1bw1ZMso5dU4vGNzjc6RFyV1qIg==",
   "success": true,
-  "projectFilePath": "D:\\WORK\\Hoc Ki 8\\New folder\\SmartInventoryApi\\SmartInventoryApi.csproj",
+  "projectFilePath": "D:\\WORK\\Hoc Ki 8\\New folder\\BE_SmartInventoryApi\\BE_SmartInventoryApi\\SmartInventoryApi\\SmartInventoryApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\vucon\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\vucon\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

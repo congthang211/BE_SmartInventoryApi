@@ -4940,11 +4940,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\WORK\\Hoc Ki 8\\New folder\\SmartInventoryApi\\SmartInventoryApi.csproj",
+      "projectUniqueName": "D:\\WORK\\Hoc Ki 8\\New folder\\BE_SmartInventoryApi\\BE_SmartInventoryApi\\SmartInventoryApi\\SmartInventoryApi.csproj",
       "projectName": "SmartInventoryApi",
-      "projectPath": "D:\\WORK\\Hoc Ki 8\\New folder\\SmartInventoryApi\\SmartInventoryApi.csproj",
+      "projectPath": "D:\\WORK\\Hoc Ki 8\\New folder\\BE_SmartInventoryApi\\BE_SmartInventoryApi\\SmartInventoryApi\\SmartInventoryApi.csproj",
       "packagesPath": "C:\\Users\\vucon\\.nuget\\packages\\",
-      "outputPath": "D:\\WORK\\Hoc Ki 8\\New folder\\SmartInventoryApi\\obj\\",
+      "outputPath": "D:\\WORK\\Hoc Ki 8\\New folder\\BE_SmartInventoryApi\\BE_SmartInventoryApi\\SmartInventoryApi\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\vucon\\AppData\\Roaming\\NuGet\\NuGet.Config",
