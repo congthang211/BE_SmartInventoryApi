@@ -9,5 +9,6 @@ namespace SmartInventoryApi.Services
         Task<PartnerDto> CreatePartnerAsync(CreatePartnerDto partnerDto);
         Task UpdatePartnerAsync(int id, UpdatePartnerDto partnerDto);
         Task DeletePartnerAsync(int id);
+        Task<PaginatedResponseDto<PartnerOrderHistoryItemDto>> GetOrderHistoryForPartnerAsync(int partnerId, PartnerOrderHistoryQueryParameters queryParameters);
     }
 }

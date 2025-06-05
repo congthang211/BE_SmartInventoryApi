@@ -25,6 +25,9 @@
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
+        public List<string>? TargetUserRoles { get; set; } // Dùng để lọc theo vai trò cụ thể, ví dụ: ["Staff"]
+
+
         private const int MaxPageSize = 50;
         private int _pageNumber = 1;
         public int PageNumber

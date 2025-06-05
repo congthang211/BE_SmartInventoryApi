@@ -91,5 +91,19 @@ namespace SmartInventoryApi.Controllers
                 return NotFound(ex.Message);
             }
         }
+        [HttpGet("{partnerId}/orders")]
+        [Authorize(Roles = "Admin,Manager")] // Admin và Manager có thể xem lịch sử giao dịch
+        public async Task<IActionResult> GetOrderHistoryForPartner(int partnerId, [FromQuery] PartnerOrderHistoryQueryParameters queryParameters)
+        {
+            try
+            {
+                var orderHistory = await _partnerService.GetOrderHistoryForPartnerAsync(partnerId, queryParameters);
+                return Ok(orderHistory);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }

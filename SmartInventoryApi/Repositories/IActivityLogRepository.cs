@@ -7,5 +7,9 @@ namespace SmartInventoryApi.Repositories
     {
         Task<IEnumerable<ActivityLog>> GetLogsAsync(ActivityLogQueryParameters queryParameters);
         Task<int> GetTotalLogsCountAsync(ActivityLogQueryParameters queryParameters);
+        Task<PaginatedResponseDto<ActivityLogDto>> GetActivityLogsAsync(
+            ActivityLogQueryParameters queryParameters,
+            int requestingUserId,
+            string requestingUserRole);
     }
 }

@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartInventoryApi.Models;
 
-namespace SmartInventoryApi.Repositories
+
+namespace SmartInventoryApi.Repositories.Categorys
 {
     public class CategoryRepository : ICategoryRepository
     {

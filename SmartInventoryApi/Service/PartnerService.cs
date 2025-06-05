@@ -99,6 +99,33 @@ namespace SmartInventoryApi.Services
                 IsActive = partner.IsActive,
                 CreatedDate = partner.CreatedDate
             };
+
         }
+        public async Task<PaginatedResponseDto<PartnerOrderHistoryItemDto>> GetOrderHistoryForPartnerAsync(int partnerId, PartnerOrderHistoryQueryParameters queryParameters)
+        {
+            var partnerExists = await _partnerRepository.GetByIdAsync(partnerId);
+            if (partnerExists == null)
+            {
+                throw new KeyNotFoundException("Partner not found.");
+            }
+
+            var orders = await _partnerRepository.GetOrdersByPartnerIdAsync(partnerId, queryParameters);
+            var totalCount = await _partnerRepository.GetOrdersByPartnerIdCountAsync(partnerId, queryParameters);
+
+            var orderHistoryItems = orders.Select(o => new PartnerOrderHistoryItemDto
+            {
+                OrderId = o.Id,
+                OrderCode = o.Code,
+                OrderType = o.OrderType,
+                OrderDate = o.OrderDate,
+                Status = o.Status,
+                TotalAmount = o.TotalAmount,
+                WarehouseName = o.Warehouse?.Name ?? "N/A"
+            }).ToList();
+
+            return new PaginatedResponseDto<PartnerOrderHistoryItemDto>(orderHistoryItems, queryParameters.PageNumber, queryParameters.PageSize, totalCount);
+        }
+
+
     }
 }

@@ -150,8 +150,6 @@ namespace SmartInventoryApi.Services
             product.MaximumStock = productDto.MaximumStock;
             product.ImageUrl = productDto.ImageUrl;
             product.IsActive = productDto.IsActive;
-            // Ghi nhận người cập nhật: product.LastModifiedBy = updatedByUserId;
-            // product.LastModifiedDate = DateTime.UtcNow;
 
             await _productRepository.UpdateAsync(product);
         }

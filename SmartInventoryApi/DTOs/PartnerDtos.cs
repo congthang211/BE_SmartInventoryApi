@@ -74,4 +74,41 @@ namespace SmartInventoryApi.DTOs
 
         public bool IsActive { get; set; }
     }
+    public class PartnerOrderHistoryItemDto
+    {
+        public int OrderId { get; set; }
+        public string OrderCode { get; set; }
+        public string OrderType { get; set; } // "Purchase" hoặc "Sale"
+        public DateTime OrderDate { get; set; }
+        public string Status { get; set; }
+        public decimal TotalAmount { get; set; }
+        public string WarehouseName { get; set; } // Kho liên quan đến đơn hàng
+    }
+
+    // DTO cho tham số truy vấn lịch sử đơn hàng của đối tác
+    public class PartnerOrderHistoryQueryParameters
+    {
+        public string? OrderType { get; set; } // "Purchase", "Sale"
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string? Status { get; set; }
+
+        private const int MaxPageSize = 50;
+        private int _pageNumber = 1;
+        public int PageNumber
+        {
+            get => _pageNumber;
+            set => _pageNumber = (value < 1) ? 1 : value;
+        }
+
+        private int _pageSize = 10;
+        public int PageSize
+        {
+            get => _pageSize;
+            set => _pageSize = (value > MaxPageSize) ? MaxPageSize : (value < 1 ? 1 : value);
+        }
+
+        public string SortBy { get; set; } = "OrderDate";
+        public string SortDirection { get; set; } = "desc";
+    }
 }

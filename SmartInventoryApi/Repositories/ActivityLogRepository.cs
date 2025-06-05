@@ -19,6 +19,7 @@ namespace SmartInventoryApi.Repositories
 
             query = ApplyFilters(query, queryParameters);
 
+
             // Sắp xếp
             if (!string.IsNullOrEmpty(queryParameters.SortBy))
             {
@@ -64,6 +65,11 @@ namespace SmartInventoryApi.Repositories
             if (queryParameters.UserId.HasValue)
             {
                 query = query.Where(log => log.UserId == queryParameters.UserId.Value);
+            }
+            if (queryParameters.TargetUserRoles != null && queryParameters.TargetUserRoles.Any())
+            {
+                // Đảm bảo User không null trước khi truy cập UserRole
+                query = query.Where(log => log.User != null && queryParameters.TargetUserRoles.Contains(log.User.UserRole));
             }
             if (!string.IsNullOrEmpty(queryParameters.Module))
             {
