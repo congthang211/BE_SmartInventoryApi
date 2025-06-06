@@ -15,7 +15,6 @@
         public DateTime LogDate { get; set; }
     }
 
-    // DTO cho các tham số truy vấn (lọc và phân trang)
     public class ActivityLogQueryParameters
     {
         public int? UserId { get; set; }
@@ -25,8 +24,8 @@
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
-        public List<string>? TargetUserRoles { get; set; } // Dùng để lọc theo vai trò cụ thể, ví dụ: ["Staff"]
-
+        // Thuộc tính này sẽ được Service Layer sử dụng để truyền điều kiện lọc vai trò xuống Repository
+        public List<string>? TargetUserRoles { get; set; }
 
         private const int MaxPageSize = 50;
         private int _pageNumber = 1;
@@ -43,7 +42,7 @@
             set => _pageSize = (value > MaxPageSize) ? MaxPageSize : (value < 1 ? 1 : value);
         }
 
-        public string SortBy { get; set; } = "LogDate"; // Mặc định sắp xếp theo LogDate
-        public string SortDirection { get; set; } = "desc"; // Mặc định giảm dần
+        public string SortBy { get; set; } = "LogDate";
+        public string SortDirection { get; set; } = "desc";
     }
 }

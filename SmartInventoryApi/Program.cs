@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SmartInventoryApi.Models;
 using SmartInventoryApi.Repositories;
+using SmartInventoryApi.Repositories.Categorys;
 using SmartInventoryApi.Services;
 using System.Text;
 
@@ -31,6 +32,7 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>();
 builder.Services.AddScoped<ISalesOrderRepository, SalesOrderRepository>();
 builder.Services.AddScoped<IStockTakeRepository, StockTakeRepository>();
+builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
 
 // Đăng ký các service nghiệp vụ
 builder.Services.AddScoped<IUserService, UserService>();
@@ -43,6 +45,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
 builder.Services.AddScoped<ISalesOrderService, SalesOrderService>();
 builder.Services.AddScoped<IStockTakeService, StockTakeService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
 
 builder.Services.AddCors(options =>
 {

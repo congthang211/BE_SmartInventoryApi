@@ -1,4 +1,4 @@
-﻿using SmartInventoryApi.DTOs; // Để sử dụng ActivityLogQueryParameters
+﻿using SmartInventoryApi.DTOs;
 using SmartInventoryApi.Models;
 
 namespace SmartInventoryApi.Repositories
@@ -7,9 +7,5 @@ namespace SmartInventoryApi.Repositories
     {
         Task<IEnumerable<ActivityLog>> GetLogsAsync(ActivityLogQueryParameters queryParameters);
         Task<int> GetTotalLogsCountAsync(ActivityLogQueryParameters queryParameters);
-        Task<PaginatedResponseDto<ActivityLogDto>> GetActivityLogsAsync(
-            ActivityLogQueryParameters queryParameters,
-            int requestingUserId,
-            string requestingUserRole);
     }
 }
