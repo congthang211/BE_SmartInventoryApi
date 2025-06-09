@@ -74,6 +74,13 @@ namespace SmartInventoryApi.Repositories
             {
                 query = query.Where(o => o.Code.Contains(queryParameters.SearchTerm));
             }
+
+            // THÊM LOGIC LỌC MỚI
+            if (queryParameters.CreatedByUserId.HasValue)
+            {
+                query = query.Where(o => o.CreatedBy == queryParameters.CreatedByUserId.Value);
+            }
+
             return query;
         }
 

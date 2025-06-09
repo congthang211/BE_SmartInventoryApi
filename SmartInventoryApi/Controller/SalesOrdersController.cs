@@ -8,7 +8,7 @@ namespace SmartInventoryApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin,Manager")] // Manager và Admin có quyền quản lý phiếu xuất
+    [Authorize] // Yêu cầu xác thực cho tất cả
     public class SalesOrdersController : ControllerBase
     {
         private readonly ISalesOrderService _salesOrderService;
@@ -19,24 +19,33 @@ namespace SmartInventoryApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Staff")] // Mở quyền cho Staff
         public async Task<IActionResult> GetAllSalesOrders([FromQuery] SalesOrderQueryParameters queryParameters)
         {
-            var orders = await _salesOrderService.GetAllSalesOrdersAsync(queryParameters);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userRole = User.FindFirstValue(ClaimTypes.Role)!;
+
+            var orders = await _salesOrderService.GetAllSalesOrdersAsync(queryParameters, userId, userRole);
             return Ok(orders);
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Manager,Staff")] // Mở quyền cho Staff
         public async Task<IActionResult> GetSalesOrderById(int id)
         {
-            var order = await _salesOrderService.GetSalesOrderByIdAsync(id);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userRole = User.FindFirstValue(ClaimTypes.Role)!;
+
+            var order = await _salesOrderService.GetSalesOrderByIdAsync(id, userId, userRole);
             if (order == null)
             {
-                return NotFound("Sales order not found.");
+                return NotFound("Sales order not found or you do not have permission to view it.");
             }
             return Ok(order);
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager,Staff")] // Mở quyền cho Staff
         public async Task<IActionResult> CreateSalesOrder([FromBody] CreateSalesOrderDto createDto)
         {
             if (!ModelState.IsValid)
@@ -66,6 +75,7 @@ namespace SmartInventoryApi.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Manager")] // Staff không có quyền này
         public async Task<IActionResult> UpdateSalesOrder(int id, [FromBody] UpdateSalesOrderDto updateDto)
         {
             if (!ModelState.IsValid)
@@ -95,6 +105,7 @@ namespace SmartInventoryApi.Controllers
         }
 
         [HttpPost("{id}/approve")]
+        [Authorize(Roles = "Admin,Manager")] // Staff không có quyền này
         public async Task<IActionResult> ApproveSalesOrder(int id)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -119,6 +130,7 @@ namespace SmartInventoryApi.Controllers
         }
 
         [HttpPost("{id}/cancel")]
+        [Authorize(Roles = "Admin,Manager")] // Staff không có quyền này
         public async Task<IActionResult> CancelSalesOrder(int id)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

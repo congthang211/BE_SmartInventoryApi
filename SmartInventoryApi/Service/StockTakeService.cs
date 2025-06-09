@@ -24,6 +24,50 @@ namespace SmartInventoryApi.Services
             _context = context;
         }
 
+        public async Task<PaginatedResponseDto<StockTakeDto>> GetAllStockTakesAsync(
+            StockTakeQueryParameters queryParameters,
+            string requestingUserRole)
+        {
+            // Logic nghiệp vụ: Nếu người dùng là Staff, chỉ hiển thị các phiếu đang chờ thực hiện
+            if (requestingUserRole == "Staff")
+            {
+                // Nếu client đã lọc theo status khác, ta sẽ ghi đè để đảm bảo Staff chỉ thấy việc của mình
+                if (string.IsNullOrEmpty(queryParameters.Status) ||
+                   (queryParameters.Status != "Draft" && queryParameters.Status != "InProgress"))
+                {
+                    // Mặc định Staff chỉ thấy các phiếu ở trạng thái "Draft".
+                    // Bạn có thể thay đổi logic này để hiển thị cả "InProgress" nếu muốn.
+                    queryParameters.Status = "Draft";
+                }
+            }
+
+            var stockTakes = await _stockTakeRepository.GetAllAsync(queryParameters);
+            var totalCount = await _stockTakeRepository.GetTotalCountAsync(queryParameters);
+            var stockTakeDtos = stockTakes.Select(MapToDto);
+            return new PaginatedResponseDto<StockTakeDto>(stockTakeDtos, queryParameters.PageNumber, queryParameters.PageSize, totalCount);
+        }
+
+        public async Task<StockTakeDto?> GetStockTakeByIdAsync(int id, string requestingUserRole)
+        {
+            var stockTake = await _stockTakeRepository.GetByIdAsync(id);
+            if (stockTake == null)
+            {
+                return null;
+            }
+
+            // Logic nghiệp vụ: Staff chỉ có thể xem chi tiết các phiếu đang chờ thực hiện
+            if (requestingUserRole == "Staff")
+            {
+                if (stockTake.Status != "Draft" && stockTake.Status != "InProgress")
+                {
+                    // Không cho phép xem phiếu đã hoàn thành hoặc đã hủy
+                    return null;
+                }
+            }
+
+            return MapToDto(stockTake);
+        }
+
         public async Task<StockTakeDto> CreateStockTakeAsync(CreateStockTakeDto dto, int createdByUserId)
         {
             var warehouse = await _warehouseRepository.GetByIdAsync(dto.WarehouseId);
@@ -245,20 +289,6 @@ namespace SmartInventoryApi.Services
 
             var cancelledStockTake = await _stockTakeRepository.GetByIdAsync(stockTakeId);
             return MapToDto(cancelledStockTake!);
-        }
-
-        public async Task<PaginatedResponseDto<StockTakeDto>> GetAllStockTakesAsync(StockTakeQueryParameters queryParameters)
-        {
-            var stockTakes = await _stockTakeRepository.GetAllAsync(queryParameters);
-            var totalCount = await _stockTakeRepository.GetTotalCountAsync(queryParameters);
-            var stockTakeDtos = stockTakes.Select(MapToDto);
-            return new PaginatedResponseDto<StockTakeDto>(stockTakeDtos, queryParameters.PageNumber, queryParameters.PageSize, totalCount);
-        }
-
-        public async Task<StockTakeDto?> GetStockTakeByIdAsync(int id)
-        {
-            var stockTake = await _stockTakeRepository.GetByIdAsync(id);
-            return stockTake == null ? null : MapToDto(stockTake);
         }
 
         private static StockTakeDto MapToDto(StockTake st)

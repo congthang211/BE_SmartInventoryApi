@@ -27,6 +27,44 @@ namespace SmartInventoryApi.Services
             _context = context;
         }
 
+        public async Task<PaginatedResponseDto<PurchaseOrderDto>> GetAllPurchaseOrdersAsync(
+            PurchaseOrderQueryParameters queryParameters,
+            int requestingUserId,
+            string requestingUserRole)
+        {
+            // Logic bảo mật: Nếu người dùng là Staff, bắt buộc lọc theo ID của họ
+            if (requestingUserRole == "Staff")
+            {
+                queryParameters.CreatedByUserId = requestingUserId;
+            }
+
+            var orders = await _purchaseOrderRepository.GetAllAsync(queryParameters);
+            var totalCount = await _purchaseOrderRepository.GetTotalCountAsync(queryParameters);
+            var orderDtos = orders.Select(MapToDto);
+            return new PaginatedResponseDto<PurchaseOrderDto>(orderDtos, queryParameters.PageNumber, queryParameters.PageSize, totalCount);
+        }
+
+        public async Task<PurchaseOrderDto?> GetPurchaseOrderByIdAsync(
+            int id,
+            int requestingUserId,
+            string requestingUserRole)
+        {
+            var order = await _purchaseOrderRepository.GetByIdAsync(id);
+            if (order == null)
+            {
+                return null;
+            }
+
+            // Logic bảo mật: Nếu người dùng là Staff, kiểm tra xem họ có phải là người tạo phiếu này không
+            if (requestingUserRole == "Staff" && order.CreatedBy != requestingUserId)
+            {
+                // Trả về null (kết quả là 404 Not Found ở Controller) để không tiết lộ sự tồn tại của phiếu
+                return null;
+            }
+
+            return MapToDto(order);
+        }
+
         public async Task<PurchaseOrderDto> CreatePurchaseOrderAsync(CreatePurchaseOrderDto dto, int createdByUserId)
         {
             var supplier = await _partnerRepository.GetByIdAsync(dto.PartnerId);
@@ -231,21 +269,6 @@ namespace SmartInventoryApi.Services
 
             var cancelledFullOrder = await _purchaseOrderRepository.GetByIdAsync(id);
             return MapToDto(cancelledFullOrder!);
-        }
-
-
-        public async Task<PaginatedResponseDto<PurchaseOrderDto>> GetAllPurchaseOrdersAsync(PurchaseOrderQueryParameters queryParameters)
-        {
-            var orders = await _purchaseOrderRepository.GetAllAsync(queryParameters);
-            var totalCount = await _purchaseOrderRepository.GetTotalCountAsync(queryParameters);
-            var orderDtos = orders.Select(MapToDto);
-            return new PaginatedResponseDto<PurchaseOrderDto>(orderDtos, queryParameters.PageNumber, queryParameters.PageSize, totalCount);
-        }
-
-        public async Task<PurchaseOrderDto?> GetPurchaseOrderByIdAsync(int id)
-        {
-            var order = await _purchaseOrderRepository.GetByIdAsync(id);
-            return order == null ? null : MapToDto(order);
         }
 
         private static PurchaseOrderDto MapToDto(Order order)

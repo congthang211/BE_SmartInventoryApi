@@ -104,6 +104,9 @@ namespace SmartInventoryApi.DTOs
         public DateTime? EndDate { get; set; }
         public string? SearchTerm { get; set; } // Tìm theo mã phiếu
 
+        // Thuộc tính này sẽ được Service Layer sử dụng để lọc theo người tạo
+        public int? CreatedByUserId { get; set; }
+
         private const int MaxPageSize = 50;
         private int _pageNumber = 1;
         public int PageNumber

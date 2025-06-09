@@ -8,7 +8,7 @@ namespace SmartInventoryApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin,Manager")] // Manager và Admin có quyền quản lý phiếu nhập
+    [Authorize] // Yêu cầu xác thực cho tất cả, quyền chi tiết sẽ đặt ở từng phương thức
     public class PurchaseOrdersController : ControllerBase
     {
         private readonly IPurchaseOrderService _purchaseOrderService;
@@ -19,24 +19,33 @@ namespace SmartInventoryApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Staff")] // Mở quyền cho Staff
         public async Task<IActionResult> GetAllPurchaseOrders([FromQuery] PurchaseOrderQueryParameters queryParameters)
         {
-            var orders = await _purchaseOrderService.GetAllPurchaseOrdersAsync(queryParameters);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userRole = User.FindFirstValue(ClaimTypes.Role)!;
+
+            var orders = await _purchaseOrderService.GetAllPurchaseOrdersAsync(queryParameters, userId, userRole);
             return Ok(orders);
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Manager,Staff")] // Mở quyền cho Staff
         public async Task<IActionResult> GetPurchaseOrderById(int id)
         {
-            var order = await _purchaseOrderService.GetPurchaseOrderByIdAsync(id);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userRole = User.FindFirstValue(ClaimTypes.Role)!;
+
+            var order = await _purchaseOrderService.GetPurchaseOrderByIdAsync(id, userId, userRole);
             if (order == null)
             {
-                return NotFound("Purchase order not found.");
+                return NotFound("Purchase order not found or you do not have permission to view it.");
             }
             return Ok(order);
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager,Staff")] // Mở quyền cho Staff
         public async Task<IActionResult> CreatePurchaseOrder([FromBody] CreatePurchaseOrderDto createDto)
         {
             if (!ModelState.IsValid)
@@ -66,6 +75,7 @@ namespace SmartInventoryApi.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Manager")] // Staff không có quyền này
         public async Task<IActionResult> UpdatePurchaseOrder(int id, [FromBody] UpdatePurchaseOrderDto updateDto)
         {
             if (!ModelState.IsValid)
@@ -95,6 +105,7 @@ namespace SmartInventoryApi.Controllers
         }
 
         [HttpPost("{id}/approve")]
+        [Authorize(Roles = "Admin,Manager")] // Staff không có quyền này
         public async Task<IActionResult> ApprovePurchaseOrder(int id)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -119,6 +130,7 @@ namespace SmartInventoryApi.Controllers
         }
 
         [HttpPost("{id}/cancel")]
+        [Authorize(Roles = "Admin,Manager")] // Staff không có quyền này
         public async Task<IActionResult> CancelPurchaseOrder(int id)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

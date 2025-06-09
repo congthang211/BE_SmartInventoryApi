@@ -8,7 +8,7 @@ namespace SmartInventoryApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin,Manager")] // Manager và Admin có quyền quản lý kiểm kê
+    [Authorize(Roles = "Admin,Manager")]
     public class StockTakesController : ControllerBase
     {
         private readonly IStockTakeService _stockTakeService;
@@ -19,19 +19,23 @@ namespace SmartInventoryApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> GetAllStockTakes([FromQuery] StockTakeQueryParameters queryParameters)
         {
-            var stockTakes = await _stockTakeService.GetAllStockTakesAsync(queryParameters);
+            var userRole = User.FindFirstValue(ClaimTypes.Role)!;
+            var stockTakes = await _stockTakeService.GetAllStockTakesAsync(queryParameters, userRole);
             return Ok(stockTakes);
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> GetStockTakeById(int id)
         {
-            var stockTake = await _stockTakeService.GetStockTakeByIdAsync(id);
+            var userRole = User.FindFirstValue(ClaimTypes.Role)!;
+            var stockTake = await _stockTakeService.GetStockTakeByIdAsync(id, userRole);
             if (stockTake == null)
             {
-                return NotFound("Stock take not found.");
+                return NotFound("Stock take not found or you do not have permission to view it.");
             }
             return Ok(stockTake);
         }
@@ -65,7 +69,7 @@ namespace SmartInventoryApi.Controllers
             }
         }
 
-        [HttpPut("{id}/record-counts")] // Staff hoặc Manager có thể ghi nhận số đếm
+        [HttpPut("{id}/record-counts")]
         [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> RecordStockTakeCounts(int id, [FromBody] RecordStockTakeCountsDto countsDto)
         {
@@ -95,7 +99,7 @@ namespace SmartInventoryApi.Controllers
             }
         }
 
-        [HttpPost("{id}/complete")] // Chỉ Manager/Admin được hoàn thành và điều chỉnh kho
+        [HttpPost("{id}/complete")]
         public async Task<IActionResult> CompleteStockTake(int id, [FromBody] string? completionNotes)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

@@ -27,6 +27,43 @@ namespace SmartInventoryApi.Services
             _context = context;
         }
 
+        public async Task<PaginatedResponseDto<SalesOrderDto>> GetAllSalesOrdersAsync(
+            SalesOrderQueryParameters queryParameters,
+            int requestingUserId,
+            string requestingUserRole)
+        {
+            // Logic bảo mật: Nếu người dùng là Staff, bắt buộc lọc theo ID của họ
+            if (requestingUserRole == "Staff")
+            {
+                queryParameters.CreatedByUserId = requestingUserId;
+            }
+
+            var orders = await _salesOrderRepository.GetAllAsync(queryParameters);
+            var totalCount = await _salesOrderRepository.GetTotalCountAsync(queryParameters);
+            var orderDtos = orders.Select(MapToDto);
+            return new PaginatedResponseDto<SalesOrderDto>(orderDtos, queryParameters.PageNumber, queryParameters.PageSize, totalCount);
+        }
+
+        public async Task<SalesOrderDto?> GetSalesOrderByIdAsync(
+            int id,
+            int requestingUserId,
+            string requestingUserRole)
+        {
+            var order = await _salesOrderRepository.GetByIdAsync(id);
+            if (order == null)
+            {
+                return null;
+            }
+
+            // Logic bảo mật: Nếu người dùng là Staff, kiểm tra xem họ có phải là người tạo phiếu này không
+            if (requestingUserRole == "Staff" && order.CreatedBy != requestingUserId)
+            {
+                return null;
+            }
+
+            return MapToDto(order);
+        }
+
         public async Task<SalesOrderDto> CreateSalesOrderAsync(CreateSalesOrderDto dto, int createdByUserId)
         {
             var customer = await _partnerRepository.GetByIdAsync(dto.PartnerId);
@@ -233,20 +270,6 @@ namespace SmartInventoryApi.Services
 
             var cancelledFullOrder = await _salesOrderRepository.GetByIdAsync(id);
             return MapToDto(cancelledFullOrder!);
-        }
-
-        public async Task<PaginatedResponseDto<SalesOrderDto>> GetAllSalesOrdersAsync(SalesOrderQueryParameters queryParameters)
-        {
-            var orders = await _salesOrderRepository.GetAllAsync(queryParameters);
-            var totalCount = await _salesOrderRepository.GetTotalCountAsync(queryParameters);
-            var orderDtos = orders.Select(MapToDto);
-            return new PaginatedResponseDto<SalesOrderDto>(orderDtos, queryParameters.PageNumber, queryParameters.PageSize, totalCount);
-        }
-
-        public async Task<SalesOrderDto?> GetSalesOrderByIdAsync(int id)
-        {
-            var order = await _salesOrderRepository.GetByIdAsync(id);
-            return order == null ? null : MapToDto(order);
         }
 
         private static SalesOrderDto MapToDto(Order order)
